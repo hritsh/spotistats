@@ -9,8 +9,8 @@ const App = () => {
 	const [mostPlayedArtist, setMostPlayedArtist] = useState(null);
 
 	const handleLogin = () => {
-		const CLIENT_ID = "8763ee41b5c8418587a28c5c754d6916";
-		const REDIRECT_URI = "http://localhost:4000";
+		const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
+		const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
 		const scopes = ["user-top-read"];
 		const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${REDIRECT_URI}&scope=${scopes.join(
 			"%20"
@@ -43,7 +43,7 @@ const App = () => {
 	}, []);
 
 	return (
-		<div className="app">
+		<div className="container">
 			<div className="header">
 				<h1>Spotistats</h1>
 				<img className="logo" src={SpotifyLogo} alt="Spotify Logo" />
