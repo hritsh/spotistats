@@ -7,6 +7,7 @@ const spotifyApi = new SpotifyWebApi();
 
 const App = () => {
 	const [mostPlayedArtist, setMostPlayedArtist] = useState(null);
+	const [mostPlayedTrack, setMostPlayedTrack] = useState(null);
 
 	const handleLogin = () => {
 		const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
@@ -20,6 +21,8 @@ const App = () => {
 
 	const handleLogout = () => {
 		setMostPlayedArtist(null);
+		setMostPlayedTrack(null);
+		window.location.hash = "";
 	};
 
 	useEffect(() => {
@@ -39,6 +42,13 @@ const App = () => {
 				.catch((error) => {
 					console.log(error);
 				});
+			spotifyApi.getMyTopTracks().then((data) => {
+				const track = data.items[0];
+				setMostPlayedTrack({
+					name: track.name,
+					image: track.album.images[0].url,
+				});
+			});
 		}
 	}, []);
 
@@ -48,11 +58,25 @@ const App = () => {
 				<h1>Spotistats</h1>
 				<img className="logo" src={SpotifyLogo} alt="Spotify Logo" />
 			</div>
-			{mostPlayedArtist ? (
+			{mostPlayedArtist && mostPlayedTrack ? (
 				<>
+					<h2 className="title">Your most played artist is:</h2>
 					<div className="artist card">
-						<h2>Your most played artist is {mostPlayedArtist.name}</h2>
-						<img src={mostPlayedArtist.image} alt={mostPlayedArtist.name} />
+						<img
+							className="image"
+							src={mostPlayedArtist.image}
+							alt={mostPlayedArtist.name}
+						/>
+						<h2 className="name">{mostPlayedArtist.name}</h2>
+					</div>
+					<h2 className="title">Your most played track is:</h2>
+					<div className="track card">
+						<img
+							className="image"
+							src={mostPlayedTrack.image}
+							alt={mostPlayedTrack.name}
+						/>
+						<h2 className="name">{mostPlayedTrack.name}</h2>
 					</div>
 					<button onClick={handleLogout}>Logout</button>
 				</>

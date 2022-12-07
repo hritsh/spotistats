@@ -23,6 +23,10 @@
   filter: drop-shadow(0 0 2em #65D46E);
 }
 
+.title {
+  font-size: 2em;
+}
+
 .card {
   max-width: 25em;
   padding: 2em;
@@ -40,5 +44,5 @@
 .card > h2 {
   color: white;
   font-size: 2em;
-  margin-top: 0;
+  margin: 0;
 }
