@@ -60,9 +60,21 @@ const App = () => {
 				<h1>Spotistats</h1>
 				<img className="logo" src={SpotifyLogo} alt="Spotify Logo" />
 			</div>
+			<div className="options">
+				<label className="label">Time Range: </label>
+				<select
+					className="select"
+					value={timeRange}
+					onChange={handleTimeRangeChange}
+				>
+					<option value="short_term">Last 4 Weeks</option>
+					<option value="medium_term">Last 6 Months</option>
+					<option value="long_term">All Time</option>
+				</select>
+			</div>
 			{topArtists && topTracks ? (
 				<>
-					<h2 className="title">Your most played artists are:</h2>
+					<h2 className="title">Your most played artists were:</h2>
 					{topArtists.map((artist) => (
 						<div className="artist card">
 							<img
@@ -73,7 +85,7 @@ const App = () => {
 							<h2 className="name">{artist.name}</h2>
 						</div>
 					))}
-					<h2 className="title">Your most played tracks are:</h2>
+					<h2 className="title">Your most played tracks were:</h2>
 					{topTracks.map((track) => (
 						<div className="track card">
 							<img
