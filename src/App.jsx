@@ -6,8 +6,9 @@ import SpotifyWebApi from "spotify-web-api-js";
 const spotifyApi = new SpotifyWebApi();
 
 const App = () => {
-	const [mostPlayedArtist, setMostPlayedArtist] = useState(null);
-	const [mostPlayedTrack, setMostPlayedTrack] = useState(null);
+	const [timeRange, setTimeRange] = useState("short_term");
+	const [topArtists, setTopArtists] = useState([]);
+	const [topTracks, setTopTracks] = useState([]);
 
 	const handleLogin = () => {
 		const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
@@ -17,6 +18,10 @@ const App = () => {
 			"%20"
 		)}`;
 		window.location = AUTH_URL;
+	};
+
+	const handleTimeRangeChange = (event) => {
+		setTimeRange(event.target.value);
 	};
 
 	const handleLogout = () => {
@@ -31,26 +36,23 @@ const App = () => {
 		if (access_token) {
 			spotifyApi.setAccessToken(access_token);
 			spotifyApi
-				.getMyTopArtists()
+				.getMyTopArtists({ time_range: timeRange, limit: 10 })
 				.then((data) => {
-					const artist = data.items[0];
-					setMostPlayedArtist({
-						name: artist.name,
-						image: artist.images[0].url,
-					});
+					setTopArtists(data.items);
 				})
 				.catch((error) => {
 					console.log(error);
 				});
-			spotifyApi.getMyTopTracks().then((data) => {
-				const track = data.items[0];
-				setMostPlayedTrack({
-					name: track.name,
-					image: track.album.images[0].url,
+			spotifyApi
+				.getMyTopTracks({ time_range: timeRange, limit: 10 })
+				.then((data) => {
+					setTopTracks(data.items);
+				})
+				.catch((error) => {
+					console.log(error);
 				});
-			});
 		}
-	}, []);
+	}, [timeRange]);
 
 	return (
 		<div className="container">
@@ -58,26 +60,30 @@ const App = () => {
 				<h1>Spotistats</h1>
 				<img className="logo" src={SpotifyLogo} alt="Spotify Logo" />
 			</div>
-			{mostPlayedArtist && mostPlayedTrack ? (
+			{topArtists && topTracks ? (
 				<>
-					<h2 className="title">Your most played artist is:</h2>
-					<div className="artist card">
-						<img
-							className="image"
-							src={mostPlayedArtist.image}
-							alt={mostPlayedArtist.name}
-						/>
-						<h2 className="name">{mostPlayedArtist.name}</h2>
-					</div>
-					<h2 className="title">Your most played track is:</h2>
-					<div className="track card">
-						<img
-							className="image"
-							src={mostPlayedTrack.image}
-							alt={mostPlayedTrack.name}
-						/>
-						<h2 className="name">{mostPlayedTrack.name}</h2>
-					</div>
+					<h2 className="title">Your most played artists are:</h2>
+					{topArtists.map((artist) => (
+						<div className="artist card">
+							<img
+								className="image"
+								src={artist.images[0].url}
+								alt={artist.name}
+							/>
+							<h2 className="name">{artist.name}</h2>
+						</div>
+					))}
+					<h2 className="title">Your most played tracks are:</h2>
+					{topTracks.map((track) => (
+						<div className="track card">
+							<img
+								className="image"
+								src={track.album.images[0].url}
+								alt={track.name}
+							/>
+							<h2 className="name">{track.name}</h2>
+						</div>
+					))}
 					<button onClick={handleLogout}>Logout</button>
 				</>
 			) : (
