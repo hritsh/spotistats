@@ -25,8 +25,9 @@ const App = () => {
 	};
 
 	const handleLogout = () => {
-		setMostPlayedArtist(null);
-		setMostPlayedTrack(null);
+		setTimeRange("short_term");
+		setTopArtists(null);
+		setTopTracks(null);
 		window.location.hash = "";
 	};
 
@@ -60,46 +61,56 @@ const App = () => {
 				<h1>Spotistats</h1>
 				<img className="logo" src={SpotifyLogo} alt="Spotify Logo" />
 			</div>
-			<div className="options">
-				<label className="label">Time Range: </label>
-				<select
-					className="select"
-					value={timeRange}
-					onChange={handleTimeRangeChange}
-				>
-					<option value="short_term">Last 4 Weeks</option>
-					<option value="medium_term">Last 6 Months</option>
-					<option value="long_term">All Time</option>
-				</select>
-			</div>
 			{topArtists && topTracks ? (
 				<>
-					<h2 className="title">Your most played artists were:</h2>
-					{topArtists.map((artist) => (
-						<div className="artist card">
-							<img
-								className="image"
-								src={artist.images[0].url}
-								alt={artist.name}
-							/>
-							<h2 className="name">{artist.name}</h2>
+					<div className="options">
+						<label className="label">Time Range: </label>
+						<select
+							className="select"
+							value={timeRange}
+							onChange={handleTimeRangeChange}
+						>
+							<option value="short_term">Last 4 Weeks</option>
+							<option value="medium_term">Last 6 Months</option>
+							<option value="long_term">All Time</option>
+						</select>
+					</div>
+					<div className="content">
+						<div className="column">
+							<h2 className="title">Your most played artists were:</h2>
+							{topArtists.map((artist) => (
+								<div className="artist card">
+									<img
+										className="image"
+										src={artist.images[0].url}
+										alt={artist.name}
+									/>
+									<h2 className="name">{artist.name}</h2>
+								</div>
+							))}
 						</div>
-					))}
-					<h2 className="title">Your most played tracks were:</h2>
-					{topTracks.map((track) => (
-						<div className="track card">
-							<img
-								className="image"
-								src={track.album.images[0].url}
-								alt={track.name}
-							/>
-							<h2 className="name">{track.name}</h2>
+						<div className="column">
+							<h2 className="title">Your most played tracks were:</h2>
+							{topTracks.map((track) => (
+								<div className="track card">
+									<img
+										className="image"
+										src={track.album.images[0].url}
+										alt={track.name}
+									/>
+									<h2 className="name">{track.name}</h2>
+								</div>
+							))}
 						</div>
-					))}
-					<button onClick={handleLogout}>Logout</button>
+					</div>
+					<button className="login" onClick={handleLogout}>
+						Logout
+					</button>
 				</>
 			) : (
-				<button onClick={handleLogin}>Log in with Spotify</button>
+				<button className="login" onClick={handleLogin}>
+					Log in with Spotify
+				</button>
 			)}
 		</div>
 	);
