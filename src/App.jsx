@@ -6,15 +6,16 @@ import SpotifyWebApi from "spotify-web-api-js";
 const spotifyApi = new SpotifyWebApi();
 
 const App = () => {
-	const [timeRange, setTimeRange] = useState("short_term");
+	const [token, setToken] = useState("");
+	const [timeRange, setTimeRange] = useState("");
 	const [topArtists, setTopArtists] = useState([]);
 	const [topTracks, setTopTracks] = useState([]);
 
 	const handleLogin = () => {
 		const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
 		const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
-		const scopes = ["user-top-read"];
-		const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${REDIRECT_URI}&scope=${scopes.join(
+		const SCOPES = ["user-top-read"];
+		const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${REDIRECT_URI}&scope=${SCOPES.join(
 			"%20"
 		)}`;
 		window.location = AUTH_URL;
@@ -25,17 +26,35 @@ const App = () => {
 	};
 
 	const handleLogout = () => {
-		setTimeRange("short_term");
+		setTimeRange("");
 		setTopArtists(null);
 		setTopTracks(null);
-		window.location.hash = "";
+		setToken("");
+		window.localStorage.removeItem("token");
 	};
 
 	useEffect(() => {
-		const params = new URLSearchParams(window.location.hash.slice(1));
-		const access_token = params.get("access_token");
-		if (access_token) {
-			spotifyApi.setAccessToken(access_token);
+		const hash = window.location.hash;
+		let token = window.localStorage.getItem("token");
+
+		if (!token && hash) {
+			token = hash
+				.substring(1)
+				.split("&")
+				.find((elem) => elem.startsWith("access_token"))
+				.split("=")[1];
+
+			window.location.hash = "";
+			window.localStorage.setItem("token", token);
+		}
+
+		setToken(token);
+		setTimeRange("short_term");
+	}, []);
+
+	useEffect(() => {
+		if (token) {
+			spotifyApi.setAccessToken(token);
 			spotifyApi
 				.getMyTopArtists({ time_range: timeRange, limit: 10 })
 				.then((data) => {
@@ -61,7 +80,7 @@ const App = () => {
 				<h1>Spotistats</h1>
 				<img className="logo" src={SpotifyLogo} alt="Spotify Logo" />
 			</div>
-			{topArtists && topTracks ? (
+			{token ? (
 				<>
 					<div className="options">
 						<label className="label">Time Range: </label>
