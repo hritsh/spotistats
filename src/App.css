@@ -37,6 +37,7 @@ body {
 }
 
 .card {
+  position: relative;
   padding: 2em;
   border-radius: 1em;
   background-color: black;
@@ -128,4 +129,20 @@ body {
   color: white;
   font-size: 2em;
   margin: 0;
+}
+
+.rank {
+  position: absolute;
+  font-size: 5em;
+  rotate: -10deg;
+  text-shadow: 3px 3px 3px #000;
+  color: white;
+  opacity: 0.9;
+  top: 5px;
+}
+
+.track > .rank {
+  right: 30px;
+  rotate: 10deg;
+  text-shadow: -3px 3px 3px #000;
 }

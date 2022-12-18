@@ -78,8 +78,9 @@ const App = () => {
 					<div className="content">
 						<div className="column">
 							<h2 className="title">Your most played artists were:</h2>
-							{topArtists.map((artist) => (
+							{topArtists.map((artist, i) => (
 								<div className="artist card">
+									<div className="rank">{"#" + (i + 1)}</div>
 									<img
 										className="image"
 										src={artist.images[0].url}
@@ -91,8 +92,9 @@ const App = () => {
 						</div>
 						<div className="column">
 							<h2 className="title">Your most played tracks were:</h2>
-							{topTracks.map((track) => (
+							{topTracks.map((track, i) => (
 								<div className="track card">
+									<div className="rank">{"#" + (i + 1)}</div>
 									<img
 										className="image"
 										src={track.album.images[0].url}
