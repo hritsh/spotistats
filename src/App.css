@@ -4,14 +4,14 @@
   text-align: center;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: 'Helvetica Neue', sans-serif;
   background-color: #040404;
-}
-
-* {
-  box-sizing: border-box;
 }
 
 .header {
@@ -41,21 +41,9 @@ body {
   border-radius: 1em;
   background-color: black;
   margin: 2em 0;
+  height: 25em;
+  width: 25em;
 }
-
-.card > img {
-  max-width: 20em;
-  height: auto;
-  border-radius: 1em;
-}
-
-.card > h2 {
-  color: white;
-  font-size: 2em;
-  margin: 0;
-}
-
-
 
 .container {
   margin: 0 auto;
@@ -125,20 +113,19 @@ body {
 }
 
 .image {
-  width: 80px;
-  height: 80px;
+  max-height: 75%;
   border-radius: 50%;
   margin: 0 20px 0 0;
 }
 
-.name {
-  font-size: 18px;
-  color: #b3b3b3;
-  margin: 0 0 5px 0;
+.track > .image {
+  border-radius: 1em;
 }
 
-.artist {
-  font-size: 14px;
-  color: #b3b3b3;
+.name {
+  font-size: 18px;
+  margin: 0 0 5px 0;
+  color: white;
+  font-size: 2em;
   margin: 0;
 }
