@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import SpotifyLogo from "./assets/spotify.svg";
-import SpotifyWebApi from "spotify-web-api-js";
-
-const spotifyApi = new SpotifyWebApi();
 
 const App = () => {
 	const [token, setToken] = useState("");
@@ -54,22 +51,32 @@ const App = () => {
 
 	useEffect(() => {
 		if (token) {
-			spotifyApi.setAccessToken(token);
-			spotifyApi
-				.getMyTopArtists({ time_range: timeRange, limit: 10 })
+			fetch(
+				"https://api.spotify.com/v1/me/top/artists?limit=10&time_range=" +
+					timeRange,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			)
+				.then((response) => response.json())
 				.then((data) => {
 					setTopArtists(data.items);
-				})
-				.catch((error) => {
-					console.log(error);
 				});
-			spotifyApi
-				.getMyTopTracks({ time_range: timeRange, limit: 10 })
+
+			fetch(
+				"https://api.spotify.com/v1/me/top/tracks?limit=10&time_range=" +
+					timeRange,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			)
+				.then((response) => response.json())
 				.then((data) => {
 					setTopTracks(data.items);
-				})
-				.catch((error) => {
-					console.log(error);
 				});
 		}
 	}, [timeRange]);
@@ -98,7 +105,7 @@ const App = () => {
 						<div className="column">
 							<h2 className="title">Your most played artists were:</h2>
 							{topArtists.map((artist, i) => (
-								<div className="artist card">
+								<div className="artist card" key={artist.id}>
 									<div className="rank">{"#" + (i + 1)}</div>
 									<img
 										className="image"
@@ -112,7 +119,7 @@ const App = () => {
 						<div className="column">
 							<h2 className="title">Your most played tracks were:</h2>
 							{topTracks.map((track, i) => (
-								<div className="track card">
+								<div className="track card" key={track.id}>
 									<div className="rank">{"#" + (i + 1)}</div>
 									<img
 										className="image"
