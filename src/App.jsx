@@ -9,8 +9,8 @@ const App = () => {
 	const [topTracks, setTopTracks] = useState([]);
 
 	const handleLogin = () => {
-		const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
-		const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
+		const CLIENT_ID = "ac72cfd4144844788946cdf6ba488fa1";
+		const REDIRECT_URI = "http://localhost:4000/";
 		const SCOPES = ["user-top-read"];
 		const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${REDIRECT_URI}&scope=${SCOPES.join(
 			"%20"
@@ -33,6 +33,15 @@ const App = () => {
 	useEffect(() => {
 		const hash = window.location.hash;
 		let token = window.localStorage.getItem("token");
+		if (token) {
+			token = JSON.parse(token);
+			if (token.expireTime < new Date().getTime()) {
+				window.localStorage.removeItem("token");
+				setToken("");
+			} else {
+				token = token.value;
+			}
+		}
 
 		if (!token && hash) {
 			token = hash
@@ -42,7 +51,16 @@ const App = () => {
 				.split("=")[1];
 
 			window.location.hash = "";
-			window.localStorage.setItem("token", token);
+			// set token with time to live of 1 hour
+			const now = new Date();
+			const time = now.getTime();
+			const expireTime = time + 3600 * 1000;
+			now.setTime(expireTime);
+			const item = {
+				value: token,
+				expireTime: expireTime,
+			};
+			window.localStorage.setItem("token", JSON.stringify(item));
 		}
 
 		setToken(token);
