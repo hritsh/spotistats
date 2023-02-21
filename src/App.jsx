@@ -11,7 +11,7 @@ const App = () => {
 	const handleLogin = () => {
 		const CLIENT_ID = "ac72cfd4144844788946cdf6ba488fa1";
 		const REDIRECT_URI = "http://localhost:4000/";
-		const SCOPES = ["user-top-read"];
+		const SCOPES = ["user-top-read", "user-read-recently-played"];
 		const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${REDIRECT_URI}&scope=${SCOPES.join(
 			"%20"
 		)}`;
@@ -78,7 +78,13 @@ const App = () => {
 					},
 				}
 			)
-				.then((response) => response.json())
+				.then((response) => {
+					if (response.status === 401) {
+						handleLogout();
+						return null;
+					}
+					return response.json();
+				})
 				.then((data) => {
 					setTopArtists(data.items);
 				});
@@ -92,7 +98,13 @@ const App = () => {
 					},
 				}
 			)
-				.then((response) => response.json())
+				.then((response) => {
+					if (response.status === 401) {
+						handleLogout();
+						return null;
+					}
+					return response.json();
+				})
 				.then((data) => {
 					setTopTracks(data.items);
 				});
