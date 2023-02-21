@@ -35,15 +35,17 @@ const App = () => {
 		let token = window.localStorage.getItem("token");
 		if (token) {
 			token = JSON.parse(token);
-			if (token.expireTime < new Date().getTime()) {
-				window.localStorage.removeItem("token");
-				setToken("");
-			} else {
-				token = token.value;
+			try {
+				if (token.expireTime < new Date().getTime()) {
+					handleLogout();
+				} else {
+					token = token.value;
+					setToken(token);
+				}
+			} catch (error) {
+				handleLogout();
 			}
-		}
-
-		if (!token && hash) {
+		} else if (!token && hash) {
 			token = hash
 				.substring(1)
 				.split("&")
