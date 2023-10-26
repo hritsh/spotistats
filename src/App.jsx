@@ -8,6 +8,7 @@ const App = () => {
   const [timeRange, setTimeRange] = useState("");
   const [topArtists, setTopArtists] = useState([]);
   const [topTracks, setTopTracks] = useState([]);
+  const [audioFeatures, setAudioFeatures] = useState({});
 
   const handleLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
@@ -74,7 +75,7 @@ const App = () => {
     if (token) {
       fetch(
         "https://api.spotify.com/v1/me/top/artists?limit=10&time_range=" +
-          timeRange,
+        timeRange,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -93,7 +94,7 @@ const App = () => {
 
       fetch(
         "https://api.spotify.com/v1/me/top/tracks?limit=10&time_range=" +
-          timeRange,
+        timeRange,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -112,80 +113,145 @@ const App = () => {
         });
 
       // fetch top genres of user
-        fetch(
-          "https://api.spotify.com/v1/me/top/artists?limit=50&time_range=" +
-            timeRange,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+      fetch(
+        "https://api.spotify.com/v1/me/top/artists?limit=50&time_range=" +
+        timeRange,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+        .then((response) => {
+          if (response.status === 401) {
+            handleLogout();
           }
-        )
-          .then((response) => {
-            if (response.status === 401) {
-              handleLogout();
+          return response.json();
+        })
+        .then((data) => {
+          const genres = data.items.map((artist) => artist.genres).flat();
+          const genreCounts = {};
+          genres.forEach((genre) => {
+            if (genreCounts[genre]) {
+              genreCounts[genre] += 1;
+            } else {
+              genreCounts[genre] = 1;
             }
-            return response.json();
-          })
-          .then((data) => {
-            console.log(data);
-            const genres = data.items.map((artist) => artist.genres).flat();
-            const genreCounts = {};
-            genres.forEach((genre) => {
-              if (genreCounts[genre]) {
-                genreCounts[genre] += 1;
-              } else {
-                genreCounts[genre] = 1;
-              }
-            });
-            const genreCountsArray = Object.entries(genreCounts);
-            genreCountsArray.sort((a, b) => b[1] - a[1]);
-            console.log(genreCountsArray);
-            
-            // limit to top 15 genres
-            const topGenres = genreCountsArray.slice(0, 15);
-            // replace values with percentages
-            const total = topGenres.reduce((acc, genre) => acc + genre[1], 0);
-            topGenres.forEach((genre) => {
-              genre[1] = Math.round((genre[1] / total) * 100);
-            });
-            console.log(topGenres);
+          });
+          const genreCountsArray = Object.entries(genreCounts);
+          genreCountsArray.sort((a, b) => b[1] - a[1]);
 
-            // create chart
-            const ctx = document.getElementById("myChart").getContext("2d");
+          // limit to top 15 genres
+          const topGenres = genreCountsArray.slice(0, 15);
+          // replace values with percentages
+          const total = topGenres.reduce((acc, genre) => acc + genre[1], 0);
+          topGenres.forEach((genre) => {
+            genre[1] = Math.round((genre[1] / total) * 100);
+          });
 
-            const labels = topGenres.map((genre) => genre[0]);
-            const genreData = topGenres.map((genre) => genre[1]);
-            const backgroundColor = labels.map((label) => {
-              const color = Math.floor(Math.random() * 16777215).toString(16);
-              return "#" + color;
-            });
+          // create chart
+          const ctx = document.getElementById("myChart").getContext("2d");
 
-            const myChart = new Chart(ctx, {
-              type: "pie",
-              data: {
-                labels: labels,
-                datasets: [
-                  {
-                    label: "Percentage",
-                    data: genreData,
-                    backgroundColor: backgroundColor,
-                    borderWidth: 1,
-                  },
-                ],
-              },
-              options: {
-                plugins: {
-                  legend: {
-                    display: true,
-                    labels: {
-                      color: "white",
-                    },
+          const labels = topGenres.map((genre) => genre[0]);
+          const genreData = topGenres.map((genre) => genre[1]);
+          const backgroundColor = labels.map((label) => {
+            const color = Math.floor(Math.random() * 16777215).toString(16);
+            return "#" + color;
+          });
+
+          const myChart = new Chart(ctx, {
+            type: "pie",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Percentage",
+                  data: genreData,
+                  backgroundColor: backgroundColor,
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              plugins: {
+                legend: {
+                  display: true,
+                  labels: {
+                    color: "white",
                   },
                 },
               },
-            });
+            },
+          });
+        }
+        )
+
+      // get users audio features
+      fetch(
+        "https://api.spotify.com/v1/me/top/tracks?limit=50&time_range=" +
+        timeRange,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+        .then((response) => {
+          if (response.status === 401) {
+            handleLogout();
           }
+          return response.json();
+        })
+        .then((data) => {
+          const trackIds = data.items.map((track) => track.id);
+          fetch(
+            "https://api.spotify.com/v1/audio-features?ids=" + trackIds,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+            .then((response) => {
+              if (response.status === 401) {
+                handleLogout();
+              }
+              return response.json();
+            })
+            .then((data) => {
+              // get average audio features
+              const audioFeatures = {};
+              const trackCount = data.audio_features.length;
+              data.audio_features.forEach((track) => {
+                for (const feature in track) {
+                  if (audioFeatures[feature]) {
+                    audioFeatures[feature] += track[feature];
+                  } else {
+                    audioFeatures[feature] = track[feature];
+                  }
+                }
+              });
+              for (const feature in audioFeatures) {
+                // remove ["key", "mode", "duration_ms", "time_signature"] from audio features
+                if (isNaN(audioFeatures[feature]) || feature === "key" || feature === "mode" || feature === "duration_ms" || feature === "time_signature") {
+                  delete audioFeatures[feature];
+                } else {
+                  audioFeatures[feature] = audioFeatures[feature] / trackCount * 100;
+                  audioFeatures[feature] = Math.round(audioFeatures[feature] * 100) / 100;
+                  if (feature === "loudness") {
+                    audioFeatures[feature] = Math.round(audioFeatures[feature] / 100) + "db";
+                  } else if (feature === "tempo") {
+                    audioFeatures[feature] = Math.round(audioFeatures[feature] / 100) + "bpm";
+                  } else {
+                    audioFeatures[feature] = audioFeatures[feature] + "%";
+                  }
+                }
+              }
+
+              setAudioFeatures(audioFeatures);
+            }
+            )
+        }
         )
     }
   }, [timeRange]);
@@ -244,8 +310,18 @@ const App = () => {
           </div>
           <div className="content">
             <div className="column">
-          <h2 className="title">Your top genres were:</h2>
-            <canvas id="myChart"></canvas>
+              <h2 className="title">Your top genres were:</h2>
+              <canvas id="myChart"></canvas>
+            </div>
+            <div className="column">
+              <div className="audio-features">
+                {Object.entries(audioFeatures).map((feature) => (
+                  <div className="feature" key={feature[0]}>
+                    <div className="feature-name">{feature[0]}</div>
+                    <div className="feature-value">{feature[1]}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           <button className="login" onClick={handleLogout}>
