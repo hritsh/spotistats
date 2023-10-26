@@ -150,3 +150,11 @@ body {
   rotate: 10deg;
   text-shadow: -3px 3px 3px #000;
 }
+
+#genres {
+  width: 50%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #121212;
+  border-radius: 8px;
+}
