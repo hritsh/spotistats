@@ -3,6 +3,7 @@
 A simple React app that displays your most played Spotify artists and tracks over different time ranges.
 
 ![image](https://user-images.githubusercontent.com/65954042/219965780-45872d3a-ab97-4af3-82ed-4477e0f01646.png)
+<img width="890" alt="image" src="https://github.com/hritsh/spotistats/assets/65954042/89214512-dbe1-4813-acec-f9cb106763ea">
 
 ## Table of Contents
 
