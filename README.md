@@ -18,6 +18,8 @@ A simple React app that displays your most played Spotify artists and tracks ove
 - Login with Spotify Account
 - Display User's Top 10 Most Played Artists with Images
 - Display User's Top 10 Most Played Tracks with Cover Art
+- Display User's Top genres in a pie chart
+- Display some interesting song feature statistics
 - Change Time Range of Stats between:
   - Last 4 Weeks
   - Last 6 Months
